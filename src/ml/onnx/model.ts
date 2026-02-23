@@ -12,7 +12,7 @@ export async function loadModel() {
 
 	// Usa i file WASM da CDN
 	ort.env.wasm.wasmPaths =
-		"https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/";
+		"https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.2/dist/";
 	ort.env.wasm.numThreads = 1;
 
 	session = await ort.InferenceSession.create(MODEL_URL, {

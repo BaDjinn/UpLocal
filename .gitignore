@@ -33,3 +33,5 @@ Thumbs.db
 # Model artifacts (see note below)
 *.onnx.tmp
 *.onnx.download
+
+*.txt
