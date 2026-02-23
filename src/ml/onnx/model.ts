@@ -1,7 +1,10 @@
 import * as ort from "onnxruntime-web";
+import * as dotenv from "dotenv";
 
-const MODEL_URL =
-	"https://huggingface.co/bukuroo/RealESRGAN-ONNX/resolve/main/RealESRGAN_x4plus.onnx";
+dotenv.config();
+
+// Vite exposes env vars prefixed with VITE_ via import.meta.env
+const MODEL_URL = process.env.ESRGAN_MODEL_URL as string;
 
 let session: ort.InferenceSession | null = null;
 
