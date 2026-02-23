@@ -1,7 +1,7 @@
 import * as ort from "onnxruntime-web";
-import * as dotenv from "dotenv";
+//import * as dotenv from "dotenv";
 
-dotenv.config();
+//dotenv.config();
 
 // Vite exposes env vars prefixed with VITE_ via import.meta.env
 
