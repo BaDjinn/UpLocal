@@ -22,3 +22,9 @@ Image upscaling **entirely in the browser** using
 ## Status
 
 Work in progress.
+
+## .ENV
+
+```
+VITE_ONNX_MODEL_URL="https://huggingface.co/AXERA-TECH/Real-ESRGAN/resolve/main/onnx/realesrgan-x4.onnx"
+```
