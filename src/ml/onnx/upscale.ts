@@ -18,11 +18,13 @@ export async function upscaleImage(imageData: ImageData): Promise<ImageData> {
 	// -----------------------------
 	const input = new Float32Array(width * height * 3);
 
-	let p = 0;
-	for (let i = 0; i < data.length; i += 4) {
-		input[p++] = data[i] / 255; // R
-		input[p++] = data[i + 1] / 255; // G
-		input[p++] = data[i + 2] / 255; // B
+	// Fill as NCHW: all R, then all G, then all B
+	const hw = width * height;
+	for (let i = 0; i < hw; i++) {
+		const px = i * 4;
+		input[0 * hw + i] = data[px] / 255; // R channel plane
+		input[1 * hw + i] = data[px + 1] / 255; // G channel plane
+		input[2 * hw + i] = data[px + 2] / 255; // B channel plane
 	}
 
 	const tensor = new ort.Tensor("float32", input, [1, 3, height, width]);
@@ -41,8 +43,14 @@ export async function upscaleImage(imageData: ImageData): Promise<ImageData> {
 	// -----------------------------
 	// 3. UPSCALE ALPHA CHANNEL
 	// -----------------------------
-	const outWidth = width * scale;
-	const outHeight = height * scale;
+	// Prefer reading the output tensor dimensions if available
+	let outWidth = width * scale;
+	let outHeight = height * scale;
+	if (Array.isArray(outputTensor.dims) && outputTensor.dims.length >= 4) {
+		// ONNX NCHW: [N, C, H, W]
+		outHeight = outputTensor.dims[2];
+		outWidth = outputTensor.dims[3];
+	}
 
 	const upscaledAlpha = new Uint8ClampedArray(outWidth * outHeight);
 
@@ -76,17 +84,24 @@ export async function upscaleImage(imageData: ImageData): Promise<ImageData> {
 	// -----------------------------
 	// 4. POSTPROCESS (NCHW -> HWC)
 	// -----------------------------
+
 	const outData = new Uint8ClampedArray(outWidth * outHeight * 4);
 	const out = outputTensor.data as Float32Array;
 
-	let o = 0;
+	const channelSize = outWidth * outHeight;
+	const rOffset = 0;
+	const gOffset = channelSize;
+	const bOffset = channelSize * 2;
+
 	let q = 0;
-	let alphaIdx = 0;
-	while (o < out.length) {
-		outData[q++] = Math.min(255, Math.max(0, out[o++] * 255)); // R
-		outData[q++] = Math.min(255, Math.max(0, out[o++] * 255)); // G
-		outData[q++] = Math.min(255, Math.max(0, out[o++] * 255)); // B
-		outData[q++] = upscaledAlpha[alphaIdx++]; // A (upscalato)
+	for (let i = 0; i < channelSize; i++) {
+		const rv = Math.min(255, Math.max(0, out[rOffset + i] * 255));
+		const gv = Math.min(255, Math.max(0, out[gOffset + i] * 255));
+		const bv = Math.min(255, Math.max(0, out[bOffset + i] * 255));
+		outData[q++] = Math.round(rv);
+		outData[q++] = Math.round(gv);
+		outData[q++] = Math.round(bv);
+		outData[q++] = upscaledAlpha[i];
 	}
 
 	const outputImageData = new ImageData(outData, outWidth, outHeight);
