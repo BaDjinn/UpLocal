@@ -10,7 +10,7 @@ export async function loadModel() {
 	if (session) {
 		return session;
 
-		ort.env.wasm.numthreads = navigator.hardwareConcurrency ?? 4;
+		ort.env.wasm.numThreads = navigator.hardwareConcurrency ?? 4;
 
 		session = await ort.InferenceSession.create(MODEL_URL, {
 			executionProviders: ["webgpu", "wasm"],

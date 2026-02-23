@@ -6,22 +6,25 @@ input.accept = "image/*";
 document.body.appendChild(input);
 
 input.onchange = async () => {
-    const file = input.files?.[0];
-    if (!file) return;
+	const file = input.files?.[0];
+	if (!file) return;
 
-    const img = await createImageBitmap(file);
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext("2d");
-    ctx?.drawImage(img, 0, 0);
+	const img = await createImageBitmap(file);
 
-    const imageData = ctx.get ImageData(0,0 canvas.width, canvas.height);
-    const upscaledData = await upscaleImage(imageData);
+	const canvas = document.createElement("canvas");
+	canvas.width = img.width;
+	canvas.height = img.height;
 
-    canvas.width = out.width;
-    canvas.height = out.height;
-    ctx.putImageData(out, 0,0);
+	const ctx = canvas.getContext("2d")!;
+	ctx.drawImage(img, 0, 0);
 
-    document.body.appendChild(canvas);
+	const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+	const out = await upscaleImage(imageData);
+
+	canvas.width = out.width;
+	canvas.height = out.height;
+	ctx.putImageData(out, 0, 0);
+
+	document.body.appendChild(canvas);
 };
