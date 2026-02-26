@@ -1,9 +1,13 @@
-import { upscaleImage } from "./ml/onnx/upscale";
+// src/main.ts
+import { initUpscaler, upscaleImageInWorker } from "./ml/onnx/workerClient";
 
 const input = document.createElement("input");
 input.type = "file";
 input.accept = "image/*";
 document.body.appendChild(input);
+
+// opzionale: pre-load modello al load della pagina (così il primo upscale non “stalla”)
+initUpscaler();
 
 input.onchange = async () => {
 	try {
@@ -21,7 +25,7 @@ input.onchange = async () => {
 
 		const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-		const out = await upscaleImage(imageData);
+		const out = await upscaleImageInWorker(imageData);
 
 		canvas.width = out.width;
 		canvas.height = out.height;
