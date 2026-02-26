@@ -16,10 +16,10 @@ export default defineConfig({
 					dest: "wasm",
 				},
 				// (opzionale ma spesso utile: alcuni pacchetti hanno anche .js “shim”)
-				{
+				/*{
 					src: "node_modules/onnxruntime-web/dist/ort-wasm*.js",
 					dest: "wasm",
-				},
+				},*/
 			],
 		}),
 	],
