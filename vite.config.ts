@@ -5,8 +5,19 @@ export default defineConfig({
 	plugins: [
 		viteStaticCopy({
 			targets: [
+				// WASM
 				{
 					src: "node_modules/onnxruntime-web/dist/ort-wasm*.wasm",
+					dest: "wasm",
+				},
+				// JS modules (inclusi jsep)
+				{
+					src: "node_modules/onnxruntime-web/dist/ort-wasm*.mjs",
+					dest: "wasm",
+				},
+				// (opzionale ma spesso utile: alcuni pacchetti hanno anche .js “shim”)
+				{
+					src: "node_modules/onnxruntime-web/dist/ort-wasm*.js",
 					dest: "wasm",
 				},
 			],
@@ -22,10 +33,5 @@ export default defineConfig({
 	build: {
 		target: "esnext",
 		minify: "esbuild",
-	},
-	optimizeDeps: {
-		esbuildOptions: {
-			target: "esnext",
-		},
 	},
 });
